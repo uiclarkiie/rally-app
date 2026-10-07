@@ -65,6 +65,14 @@ for(const [key,start,end,slots] of [['bad','19:00','21:00',16],['pickle','08:00'
 state.sessionConfigs=sessionConfigs;
 // Preserve any running match from the original prototype.
 if(state.active.length&&!sessionConfigs.bad.matches.length){sessionConfigs.bad.matches[0]=state.active;state.active=[];persist()}
+// Apply the requested defaults once to older saved demo sessions, preserving every player.
+if(state.queueDefaultsVersion!==2){
+ const c=sessionConfigs.bad;
+ for(const match of c.matches){for(const name of match||[]){if(!state.queue.includes(name))state.queue.push(name)}}
+ c.matches=[];c.scores=[];c.courts=1;c.mode='doubles';
+ state.queueDefaultsVersion=2;persist();
+}
+
 function organizer(){return '<span class="eyebrow">CLUB ORGANIZER</span><h1 style="font-size:48px">Your club.<br>Your games.</h1><div class="grid">'+clubs.map(c=>'<article class="card card-body"><span class="tag">'+c.sport+' · '+(state.clubPlans[c.id]?'Premium':'Free')+'</span><h3>'+c.name+'</h3>'+btn('Open club','club','primary',c.id)+'</article>').join('')+'</div>'}
 function sessionKey(){return location.hash.includes('openplay')?'pickle':location.hash.includes('padel')?'padel':'bad'}
 function courtVisual(sport,active=[],mode='doubles'){
